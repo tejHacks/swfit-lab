@@ -1,0 +1,374 @@
+{
+  "course": "swift",
+  "title": "Swift: Zero to Advanced",
+  "tagline": "Learn Swift 6 the right way: fundamentals, types, memory, concurrency, SwiftUI and advanced topics.",
+  "modules": [
+    {
+      "id": "start",
+      "title": "Getting Started",
+      "level": "beginner",
+      "icon": "rocket_launch",
+      "color": "#F05138",
+      "description": "What Swift is, setting up Xcode, and your first program.",
+      "lessons": [
+        {
+          "slug": "what-is-swift",
+          "title": "What is Swift?",
+          "summary": "Apple's fast, safe, modern language, and what you can build with it.",
+          "minutes": 5,
+          "questions": 3
+        },
+        {
+          "slug": "setup-xcode",
+          "title": "Setting Up: Xcode & Playgrounds",
+          "summary": "Install Xcode, run code instantly in Playgrounds, and create your first app.",
+          "minutes": 7,
+          "questions": 2
+        },
+        {
+          "slug": "first-program",
+          "title": "Your First Swift Program",
+          "summary": "print, comments, and how Swift code is structured.",
+          "minutes": 5,
+          "questions": 2
+        }
+      ]
+    },
+    {
+      "id": "fundamentals",
+      "title": "Swift Fundamentals",
+      "level": "beginner",
+      "icon": "code",
+      "color": "#E8590C",
+      "description": "Variables, types, operators, strings, optionals and control flow.",
+      "lessons": [
+        {
+          "slug": "variables-constants",
+          "title": "Variables & Constants",
+          "summary": "let vs var, naming, and why constants are preferred.",
+          "minutes": 6,
+          "questions": 2
+        },
+        {
+          "slug": "types-and-inference",
+          "title": "Basic Types & Type Safety",
+          "summary": "Int, Double, Bool, String, Character, and converting between them.",
+          "minutes": 7,
+          "questions": 2
+        },
+        {
+          "slug": "operators",
+          "title": "Operators",
+          "summary": "Arithmetic, comparison, logic, ranges and the ternary operator.",
+          "minutes": 6,
+          "questions": 2
+        },
+        {
+          "slug": "strings",
+          "title": "Strings & Characters",
+          "summary": "Working with text, multi-line strings and Unicode.",
+          "minutes": 7,
+          "questions": 2
+        },
+        {
+          "slug": "optionals",
+          "title": "Optionals",
+          "summary": "Swift's way of saying \"there might be no value\", safely.",
+          "minutes": 10,
+          "questions": 3
+        },
+        {
+          "slug": "control-flow",
+          "title": "Control Flow",
+          "summary": "if, switch, loops, and Swift's powerful pattern matching.",
+          "minutes": 9,
+          "questions": 2
+        }
+      ]
+    },
+    {
+      "id": "collections",
+      "title": "Collections & Functions",
+      "level": "beginner",
+      "icon": "data_object",
+      "color": "#D97706",
+      "description": "Arrays, dictionaries, sets, functions and closures.",
+      "lessons": [
+        {
+          "slug": "arrays",
+          "title": "Arrays",
+          "summary": "Ordered lists of values.",
+          "minutes": 7,
+          "questions": 2
+        },
+        {
+          "slug": "dictionaries-sets",
+          "title": "Dictionaries, Sets & Tuples",
+          "summary": "Key-value lookups, unique collections and lightweight groups.",
+          "minutes": 7,
+          "questions": 2
+        },
+        {
+          "slug": "functions",
+          "title": "Functions",
+          "summary": "Parameters, labels, defaults, return values and inout.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "closures",
+          "title": "Closures",
+          "summary": "Functions as values, trailing closures and capture.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "higher-order-functions",
+          "title": "map, filter, reduce & Friends",
+          "summary": "Transform collections declaratively.",
+          "minutes": 8,
+          "questions": 2
+        }
+      ]
+    },
+    {
+      "id": "types",
+      "title": "Building Types",
+      "level": "intermediate",
+      "icon": "category",
+      "color": "#2563EB",
+      "description": "Structs, classes, enums, properties, initializers, protocols, extensions and generics.",
+      "lessons": [
+        {
+          "slug": "structs",
+          "title": "Structs",
+          "summary": "Your own value types with properties and methods.",
+          "minutes": 8,
+          "questions": 2
+        },
+        {
+          "slug": "classes",
+          "title": "Classes & Inheritance",
+          "summary": "Reference types, inheritance, overriding and deinit.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "enums",
+          "title": "Enums",
+          "summary": "Cases, raw values, associated values and methods.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "properties",
+          "title": "Properties: Computed, Observers & Lazy",
+          "summary": "More than stored values.",
+          "minutes": 8,
+          "questions": 2
+        },
+        {
+          "slug": "initializers",
+          "title": "Initializers",
+          "summary": "Memberwise, custom, failable and convenience inits.",
+          "minutes": 8,
+          "questions": 2
+        },
+        {
+          "slug": "protocols",
+          "title": "Protocols",
+          "summary": "Define capabilities; the heart of Swift's design.",
+          "minutes": 10,
+          "questions": 2
+        },
+        {
+          "slug": "extensions",
+          "title": "Extensions",
+          "summary": "Add functionality to any type, even ones you don't own.",
+          "minutes": 6,
+          "questions": 1
+        },
+        {
+          "slug": "generics",
+          "title": "Generics",
+          "summary": "Write flexible, reusable, type-safe code.",
+          "minutes": 9,
+          "questions": 2
+        }
+      ]
+    },
+    {
+      "id": "safety",
+      "title": "Errors, Memory & Access",
+      "level": "intermediate",
+      "icon": "memory",
+      "color": "#7C3AED",
+      "description": "Error handling, ARC and retain cycles, and access control.",
+      "lessons": [
+        {
+          "slug": "error-handling",
+          "title": "Error Handling",
+          "summary": "throws, do/try/catch, typed throws and Result.",
+          "minutes": 9,
+          "questions": 3
+        },
+        {
+          "slug": "memory-arc",
+          "title": "Memory & ARC",
+          "summary": "Automatic Reference Counting, retain cycles, weak and unowned.",
+          "minutes": 10,
+          "questions": 3
+        },
+        {
+          "slug": "access-control",
+          "title": "Access Control",
+          "summary": "private, fileprivate, internal, package, public and open.",
+          "minutes": 6,
+          "questions": 2
+        }
+      ]
+    },
+    {
+      "id": "concurrency",
+      "title": "Concurrency",
+      "level": "advanced",
+      "icon": "sync",
+      "color": "#0E7490",
+      "description": "async/await, tasks, actors, Sendable and Swift 6 data-race safety.",
+      "lessons": [
+        {
+          "slug": "async-await",
+          "title": "async / await",
+          "summary": "Write asynchronous code that reads like normal code.",
+          "minutes": 9,
+          "questions": 3
+        },
+        {
+          "slug": "tasks-and-groups",
+          "title": "Tasks, Task Groups & Cancellation",
+          "summary": "Structured concurrency for many jobs at once.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "actors-sendable",
+          "title": "Actors & Sendable",
+          "summary": "Protect shared mutable state from data races.",
+          "minutes": 10,
+          "questions": 2
+        },
+        {
+          "slug": "main-actor",
+          "title": "The Main Actor & Swift 6 Concurrency",
+          "summary": "UI work on the main thread, isolation and strict checking.",
+          "minutes": 8,
+          "questions": 2
+        }
+      ]
+    },
+    {
+      "id": "swiftui",
+      "title": "SwiftUI & iOS",
+      "level": "intermediate",
+      "icon": "phone_iphone",
+      "color": "#16A34A",
+      "description": "Build real iOS apps: views, state, Observation, navigation, networking and SwiftData.",
+      "lessons": [
+        {
+          "slug": "swiftui-basics",
+          "title": "SwiftUI Basics",
+          "summary": "Views, modifiers and layout stacks.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "state-and-binding",
+          "title": "State & Bindings",
+          "summary": "@State, @Binding and the single source of truth.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "observable",
+          "title": "Observation: @Observable Models",
+          "summary": "Share app state across views with the Observation framework.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "lists-navigation",
+          "title": "Lists & Navigation",
+          "summary": "List, ForEach, NavigationStack, sheets and tabs.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "networking-codable",
+          "title": "Networking & Codable",
+          "summary": "Call REST APIs and decode JSON into Swift types.",
+          "minutes": 10,
+          "questions": 3
+        },
+        {
+          "slug": "swiftdata",
+          "title": "Saving Data with SwiftData",
+          "summary": "Persist models on the device with @Model and @Query.",
+          "minutes": 9,
+          "questions": 3
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "title": "Advanced Swift",
+      "level": "advanced",
+      "icon": "workspace_premium",
+      "color": "#DC2626",
+      "description": "Associated types, property wrappers, macros, ownership, testing and architecture.",
+      "lessons": [
+        {
+          "slug": "protocols-advanced",
+          "title": "Associated Types & Protocol-Oriented Design",
+          "summary": "Generic protocols, primary associated types and composition.",
+          "minutes": 9,
+          "questions": 2
+        },
+        {
+          "slug": "property-wrappers",
+          "title": "Property Wrappers & Result Builders",
+          "summary": "The magic behind @State and SwiftUI's view syntax.",
+          "minutes": 8,
+          "questions": 2
+        },
+        {
+          "slug": "macros",
+          "title": "Macros",
+          "summary": "Compile-time code generation: #Preview, @Observable, @Model and your own.",
+          "minutes": 7,
+          "questions": 2
+        },
+        {
+          "slug": "noncopyable-ownership",
+          "title": "Ownership & Noncopyable Types",
+          "summary": "~Copyable, consuming and borrowing for advanced performance and safety.",
+          "minutes": 8,
+          "questions": 2
+        },
+        {
+          "slug": "swift-testing",
+          "title": "Testing with Swift Testing",
+          "summary": "@Test, #expect, parameterized tests and async tests.",
+          "minutes": 8,
+          "questions": 2
+        },
+        {
+          "slug": "app-architecture",
+          "title": "App Architecture & Shipping",
+          "summary": "MVVM, project structure, performance and the App Store.",
+          "minutes": 9,
+          "questions": 2
+        }
+      ]
+    }
+  ]
+}

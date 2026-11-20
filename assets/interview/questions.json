@@ -1,0 +1,436 @@
+[
+ {
+  "id": "let-vs-var",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "What is the difference between `let` and `var`?",
+  "a": "`let` declares a **constant**: it can be assigned once and never changed. `var` declares a **variable** that can be reassigned.\n\nFor value types (structs, enums, arrays), `let` also makes the whole value immutable: you can't call `mutating` methods or change properties. For a class instance, `let` only fixes the **reference**. The object's `var` properties can still change.\n\nBest practice: use `let` by default and switch to `var` only when needed."
+ },
+ {
+  "id": "type-inference",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "What is type inference, and is Swift statically typed?",
+  "a": "Swift is **statically typed**: every value's type is known at compile time. **Type inference** means the compiler works the type out from context, so you don't have to write it: `let count = 3` is an `Int`.\n\nYou can still annotate (`let price: Double = 3`) when you want a different type or extra clarity. Inference never makes code dynamic: types can't change at runtime."
+ },
+ {
+  "id": "value-vs-reference",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "Explain value types vs reference types, with examples.",
+  "a": "- **Value types** (`struct`, `enum`, tuples, and the standard `Array`, `String`, `Dictionary`) are **copied** on assignment. Each copy is independent.\n- **Reference types** (`class`, `actor`, closures) are **shared**: assigning copies a reference to the same instance.\n\n```swift\nstruct P { var x = 0 }\nvar a = P(); var b = a; b.x = 9      // a.x is still 0\n\nclass C { var x = 0 }\nlet c1 = C(); let c2 = c1; c2.x = 9  // c1.x is now 9\n```\n\nValue types make code easier to reason about and are safer under concurrency. Swift collections use **copy-on-write**, so copies are cheap until one is modified."
+ },
+ {
+  "id": "struct-vs-class",
+  "category": "Types & Protocols",
+  "level": "beginner",
+  "q": "When would you choose a class over a struct?",
+  "a": "Default to **structs**. Choose a **class** when you need:\n\n- **Identity**: the same instance shared and observed from several places (for example a view model or a cache).\n- **Inheritance** (also needed for UIKit subclasses like `UIViewController`).\n- **deinit** to clean up resources.\n- **Objective-C interop** (`@objc`, NSObject subclasses).\n\nAlso consider an **actor** when shared mutable state is accessed concurrently."
+ },
+ {
+  "id": "optionals-what",
+  "category": "Optionals",
+  "level": "beginner",
+  "q": "What is an optional, and how is it implemented?",
+  "a": "An optional represents \"a value **or** nothing\". `String?` is shorthand for `Optional<String>`, which is just an enum:\n\n```swift\nenum Optional<Wrapped> {\n    case none\n    case some(Wrapped)\n}\n```\n\n`nil` is `.none`. Because \"no value\" is a distinct type, the compiler forces you to handle it before use, which eliminates a whole class of null-pointer crashes."
+ },
+ {
+  "id": "unwrapping",
+  "category": "Optionals",
+  "level": "beginner",
+  "q": "What are the different ways to unwrap an optional? Which do you prefer?",
+  "a": "1. `if let value { ... }`: optional binding.\n2. `guard let value else { return }`: early exit; keeps the happy path un-indented.\n3. `value ?? defaultValue`: nil-coalescing.\n4. `value?.property`: optional chaining (the result is optional).\n5. `switch` / pattern matching: `case .some(let v)`.\n6. `value!`: force unwrap. It **crashes** if nil, so avoid it except for truly impossible cases.\n\nPrefer `guard let` for preconditions and `if let` or `??` elsewhere."
+ },
+ {
+  "id": "optional-chaining",
+  "category": "Optionals",
+  "level": "intermediate",
+  "q": "What does `user?.address?.city?.count` return when `address` is nil?",
+  "a": "It returns **`nil`**, typed `Int?`. Optional chaining stops evaluating at the first `nil` link and makes the whole expression optional, with no crash. Methods in the chain also return optionals, so `user?.logout()` returns `Void?` (`nil` if `user` was nil). That lets you check whether the call actually happened."
+ },
+ {
+  "id": "implicitly-unwrapped",
+  "category": "Optionals",
+  "level": "intermediate",
+  "q": "What is an implicitly unwrapped optional (`String!`) and when is it used?",
+  "a": "It's an optional that is automatically force-unwrapped wherever it's used as a non-optional. If it's `nil` at that moment, the app crashes.\n\nIt exists for values that **can't be set in `init` but are guaranteed to be set before use**, most famously UIKit `@IBOutlet`s and some two-phase setups. In modern Swift, prefer real optionals, `lazy` properties or dependency injection through `init`."
+ },
+ {
+  "id": "guard-vs-if",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "What's the difference between `guard` and `if`?",
+  "a": "`guard` checks a condition and **requires** its `else` branch to exit the scope (`return`, `throw`, `break`, `continue` or a `Never` call). Variables bound with `guard let` remain available **after** the guard, for the rest of the scope.\n\nThat makes guard ideal for validating preconditions at the top of a function and keeping the main logic un-nested (\"early exit\"). Use `if` when both branches continue normally."
+ },
+ {
+  "id": "switch-exhaustive",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "What's special about Swift's `switch` compared with C or Java?",
+  "a": "- It must be **exhaustive**: every possible value must be handled (or use `default`).\n- **No implicit fallthrough**, so no `break` is needed (use `fallthrough` explicitly).\n- **Pattern matching**: ranges (`case 1...5`), tuples, `where` clauses, enum associated values (`case .failure(let error)`), type casts (`case let s as String`).\n- It can be used as an **expression**: `let label = switch x { case 0: \"zero\" default: \"other\" }`."
+ },
+ {
+  "id": "closures-capture",
+  "category": "Swift Basics",
+  "level": "intermediate",
+  "q": "What is a closure and how does capturing work?",
+  "a": "A closure is a self-contained block of code that can be passed around and called later. Functions are named closures.\n\nClosures **capture** variables from their surrounding scope **by reference**, keeping them alive:\n\n```swift\nfunc counter() -> () -> Int {\n    var n = 0\n    return { n += 1; return n }\n}\n```\n\nUse a **capture list** to capture by value or weakly: `{ [count] in ... }` copies the current value; `{ [weak self] in ... }` avoids retain cycles."
+ },
+ {
+  "id": "escaping",
+  "category": "Swift Basics",
+  "level": "intermediate",
+  "q": "What does `@escaping` mean?",
+  "a": "A closure parameter is **non-escaping** by default: it's guaranteed to be called (if at all) before the function returns. Mark it `@escaping` when the closure may be **stored or called later**, such as a completion handler kept in a property or dispatched asynchronously.\n\nNon-escaping closures can be optimised by the compiler and can use `self` implicitly. Escaping closures make you think about memory, because they may create retain cycles."
+ },
+ {
+  "id": "higher-order",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "Explain `map`, `compactMap`, `flatMap`, `filter` and `reduce`.",
+  "a": "- `map`: transform each element → `[1,2].map { $0 * 2 }` = `[2,4]`\n- `compactMap`: transform and **drop nils** → `[\"1\",\"x\"].compactMap { Int($0) }` = `[1]`\n- `flatMap`: transform into sequences and **flatten** → `[[1],[2,3]].flatMap { $0 }` = `[1,2,3]`\n- `filter`: keep elements matching a predicate\n- `reduce`: combine everything into one value → `[1,2,3].reduce(0, +)` = `6`\n\nOn optionals, `map` and `flatMap` transform the wrapped value if present."
+ },
+ {
+  "id": "protocols-what",
+  "category": "Types & Protocols",
+  "level": "beginner",
+  "q": "What is a protocol, and what is protocol-oriented programming?",
+  "a": "A protocol defines a **contract** of requirements (properties, methods, initializers) that conforming types must implement. Structs, enums, classes and actors can all conform.\n\n**Protocol-oriented programming** means building behaviour by composing small protocols plus **protocol extensions** with default implementations, instead of deep class inheritance. You get shared behaviour for value types, easy testing (inject a protocol, pass a mock) and flexible composition (`Named & Priced`)."
+ },
+ {
+  "id": "protocol-extension-dispatch",
+  "category": "Types & Protocols",
+  "level": "advanced",
+  "q": "A method is declared only in a protocol extension (not in the protocol). A conforming type implements it too. Which version is called through a variable of the protocol type?",
+  "a": "The **extension's** version. Methods declared only in a protocol extension are **statically dispatched**: the call is resolved at compile time from the variable's static type.\n\n```swift\nprotocol Greeter {}\nextension Greeter { func hi() -> String { \"extension\" } }\nstruct English: Greeter { func hi() -> String { \"type\" } }\n\nlet g: any Greeter = English()\ng.hi()                  // \"extension\"\nEnglish().hi()          // \"type\"\n```\n\nIf `hi()` is declared **in the protocol** itself, it becomes a requirement, dispatched dynamically through the witness table, and the type's version wins."
+ },
+ {
+  "id": "associated-types",
+  "category": "Types & Protocols",
+  "level": "intermediate",
+  "q": "What is an associated type? Give an example.",
+  "a": "An `associatedtype` is a placeholder type inside a protocol, filled in by each conforming type. It makes protocols generic.\n\n```swift\nprotocol Container {\n    associatedtype Item\n    mutating func append(_ item: Item)\n    var count: Int { get }\n}\nstruct IntBox: Container { var items: [Int] = []\n    mutating func append(_ item: Int) { items.append(item) }\n    var count: Int { items.count } }\n```\n\n`Collection.Element` and `Sequence.Iterator` are associated types. With **primary associated types** (`protocol Container<Item>`), you can write `some Container<Int>`."
+ },
+ {
+  "id": "some-vs-any",
+  "category": "Types & Protocols",
+  "level": "intermediate",
+  "q": "What's the difference between `some Protocol` and `any Protocol`?",
+  "a": "- `some P` is an **opaque type**: one specific concrete type, chosen by the implementation and hidden from the caller. The compiler knows it, so calls are statically dispatched and fast. SwiftUI's `var body: some View` is the classic example.\n- `any P` is an **existential**: a box that can hold *any* conforming type, and the value inside can change at runtime. It has a small cost (boxing and dynamic dispatch).\n\nUse `some` (or generics) by default. Use `any` when you need different concrete types together, such as `[any Shape]`."
+ },
+ {
+  "id": "generics-why",
+  "category": "Types & Protocols",
+  "level": "intermediate",
+  "q": "Why use generics? What are constraints?",
+  "a": "Generics let you write **one** type-safe implementation that works for many types, with no duplication and no losing types to `Any`.\n\n```swift\nfunc firstDuplicate<T: Hashable>(_ items: [T]) -> T? {\n    var seen = Set<T>()\n    for item in items where !seen.insert(item).inserted { return item }\n    return nil\n}\n```\n\n**Constraints** (`T: Hashable`, `where T.Element: Equatable`) limit which types can be used, so you can call the required methods. Generic code is specialised by the compiler for performance."
+ },
+ {
+  "id": "enums-associated",
+  "category": "Types & Protocols",
+  "level": "beginner",
+  "q": "What are associated values in enums, and how are they different from raw values?",
+  "a": "- **Raw values** are fixed constants of one type per case (`case get = \"GET\"`), the same for every instance. They're used for conversion (`init?(rawValue:)`).\n- **Associated values** attach **different data to each instance** of a case: `case success(Data)`, `case failure(Error)`.\n\nAssociated values are ideal for modelling state (`enum Load { case loading, loaded([Item]), failed(Error) }`): the compiler forces you to handle every state, and impossible states can't be represented."
+ },
+ {
+  "id": "mutating",
+  "category": "Types & Protocols",
+  "level": "beginner",
+  "q": "Why do some struct methods need `mutating`?",
+  "a": "Structs are value types and their methods get an immutable `self` by default. A method that changes properties (or reassigns `self`) must be marked `mutating`, so the change is explicit and so it can't be called on a `let` constant. Classes don't need it because `self` is a reference."
+ },
+ {
+  "id": "computed-vs-stored",
+  "category": "Types & Protocols",
+  "level": "beginner",
+  "q": "What is the difference between stored and computed properties? What are property observers?",
+  "a": "- **Stored properties** hold a value in memory.\n- **Computed properties** run code each time they're read (and optionally written). They don't store anything.\n\n**Property observers** `willSet` / `didSet` run code before or after a stored property changes (not during `init`). They're useful for validation, side effects or syncing. `lazy` stored properties are created on first access."
+ },
+ {
+  "id": "copy-on-write",
+  "category": "Types & Protocols",
+  "level": "advanced",
+  "q": "What is copy-on-write and how would you implement it for a custom type?",
+  "a": "Copy-on-write (COW) makes copies of large value types cheap: copies **share storage** until one of them is mutated, and only then is the storage duplicated. `Array`, `Dictionary`, `Set` and `String` use it.\n\nImplement it with a class for storage plus `isKnownUniquelyReferenced`:\n\n```swift\nfinal class Storage { var values: [Int]; init(_ v: [Int]) { values = v } }\n\nstruct BigList {\n    private var storage = Storage([])\n    var values: [Int] { storage.values }\n\n    mutating func append(_ v: Int) {\n        if !isKnownUniquelyReferenced(&storage) {\n            storage = Storage(storage.values)   // copy only when shared\n        }\n        storage.values.append(v)\n    }\n}\n```"
+ },
+ {
+  "id": "arc",
+  "category": "Memory",
+  "level": "beginner",
+  "q": "How does memory management work in Swift?",
+  "a": "Swift uses **ARC (Automatic Reference Counting)** for class instances (and actors and closures). Each instance tracks how many **strong references** point to it. When the count drops to zero, `deinit` runs and the memory is freed immediately (there's no garbage-collector pause).\n\nValue types (structs, enums) live inline or are managed through copy-on-write buffers. You don't manage them, but they can **contain** references that ARC counts."
+ },
+ {
+  "id": "retain-cycle",
+  "category": "Memory",
+  "level": "intermediate",
+  "q": "What is a retain cycle, and how do you fix one?",
+  "a": "A retain cycle happens when two (or more) objects hold **strong** references to each other, so neither count reaches zero and both leak.\n\nCommon causes:\n- parent ↔ child references (a delegate or owner back-pointer)\n- closures stored by an object that capture `self`\n\nFixes:\n- make one side `weak` (it becomes nil when the target dies) or `unowned`\n- use a capture list in closures: `{ [weak self] in guard let self else { return } ... }`\n\nDetect leaks with Xcode's **Memory Graph Debugger** and **Instruments → Leaks**."
+ },
+ {
+  "id": "weak-vs-unowned",
+  "category": "Memory",
+  "level": "intermediate",
+  "q": "What's the difference between `weak` and `unowned`?",
+  "a": "Both create references that don't increase the retain count.\n\n- `weak`: always an **optional `var`**; automatically set to `nil` when the object is deallocated. Use it when the referenced object may die first (delegates, parent references).\n- `unowned`: **non-optional**. Accessing it after the object is gone **crashes**. Use it only when the other object is guaranteed to outlive this one (for example a credit card that always has a customer).\n\nWhen unsure, choose `weak`."
+ },
+ {
+  "id": "delegate-weak",
+  "category": "Memory",
+  "level": "intermediate",
+  "q": "Why are delegates usually declared `weak`, and what's required to do that?",
+  "a": "A view controller typically owns a view (strong reference), and the view points back to its delegate (the controller). If the delegate reference were strong, that would be a retain cycle.\n\n`weak` requires a **class-bound** protocol, because only reference types can be weak:\n\n```swift\nprotocol PickerDelegate: AnyObject { func didPick(_ value: Int) }\nfinal class Picker { weak var delegate: (any PickerDelegate)? }\n```"
+ },
+ {
+  "id": "capture-self",
+  "category": "Memory",
+  "level": "intermediate",
+  "q": "Do you always need `[weak self]` in closures?",
+  "a": "No. You need it when the closure is **stored** (directly or indirectly) by `self`, or outlives `self` in a way that keeps `self` alive longer than wanted.\n\nYou usually **don't** need it for:\n- non-escaping closures (`map`, `filter`, SwiftUI `body`)\n- short-lived work where keeping `self` alive briefly is fine\n- structs (value types aren't reference-counted)\n\nIn `Task { }` inside a class, `self` is retained until the task finishes. Use `[weak self]` for long-running or repeating tasks, and cancel tasks when appropriate."
+ },
+ {
+  "id": "error-handling",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "How does error handling work in Swift?",
+  "a": "Functions that can fail are marked `throws` and signal failure with `throw SomeError`. Callers must use `try` inside `do { } catch { }`, or propagate the error by being `throws` themselves.\n\n```swift\ndo {\n    let user = try decoder.decode(User.self, from: data)\n} catch let DecodingError.keyNotFound(key, _) {\n    print(\"Missing \\(key)\")\n} catch {\n    print(error)\n}\n```\n\n- `try?` turns errors into `nil`; `try!` crashes on error.\n- `Result<Success, Failure>` stores an outcome as a value.\n- `defer` runs cleanup however the scope exits.\n- Swift 6 adds **typed throws**: `throws(ParseError)`."
+ },
+ {
+  "id": "typed-throws",
+  "category": "Swift Basics",
+  "level": "advanced",
+  "q": "What are typed throws and when should you use them?",
+  "a": "Swift 6 lets a function declare the **exact error type** it throws: `func parse() throws(ParseError) -> Int`. In a `catch` block, `error` is then `ParseError` rather than `any Error`, so you can switch over it exhaustively. It also works in generic code and in environments where existential boxing is costly (embedded).\n\nUse typed throws for **closed, internal** error domains, such as a parser or validator. For public APIs that may evolve or wrap other errors, untyped `throws` is usually more flexible."
+ },
+ {
+  "id": "access-levels",
+  "category": "Swift Basics",
+  "level": "beginner",
+  "q": "List Swift's access levels.",
+  "a": "From most to least restrictive:\n\n- `private`: the enclosing declaration (plus its extensions in the same file)\n- `fileprivate`: the current file\n- `internal` (**default**): the whole module\n- `package`: modules in the same Swift package\n- `public`: visible to other modules, but **not** subclassable or overridable outside\n- `open`: public **and** subclassable or overridable outside the module\n\n`private(set)` makes a setter more restrictive than its getter."
+ },
+ {
+  "id": "async-await",
+  "category": "Concurrency",
+  "level": "intermediate",
+  "q": "How does async/await improve on completion handlers?",
+  "a": "- **Linear code**: no nested callbacks (\"pyramid of doom\").\n- **Errors** use normal `try`/`catch` instead of a `Result` parameter.\n- The compiler guarantees each path **returns exactly once**, so you can't forget to call a completion handler or call it twice.\n- **Structured concurrency**: child tasks, automatic cancellation propagation.\n- Works with actors for **compile-time data-race safety**.\n\n`await` marks suspension points where the function may pause **without blocking a thread**."
+ },
+ {
+  "id": "task-vs-detached",
+  "category": "Concurrency",
+  "level": "intermediate",
+  "q": "What's the difference between `Task { }` and `Task.detached { }`?",
+  "a": "`Task { }` creates **unstructured** top-level work that **inherits** the current actor (for example the main actor), the priority and task-local values.\n\n`Task.detached { }` inherits **nothing**: no actor isolation and no task-locals. It's rarely needed; use it for genuinely independent background work.\n\nNeither is a *child* task. For structured children use `async let` or task groups, which are cancelled with their parent automatically."
+ },
+ {
+  "id": "structured-concurrency",
+  "category": "Concurrency",
+  "level": "advanced",
+  "q": "What is structured concurrency?",
+  "a": "Concurrent work forms a **tree**: child tasks (from `async let` or `withTaskGroup`) belong to a parent scope and **cannot outlive it**. The scope doesn't return until all children finish.\n\nBenefits:\n- **Cancellation propagates** from parent to children automatically.\n- **Errors propagate**: if one child throws in a throwing group, the siblings are cancelled.\n- No leaked or forgotten background work, and priorities are inherited.\n\nUnstructured `Task {}` is the escape hatch when you need work to outlive the scope."
+ },
+ {
+  "id": "actors",
+  "category": "Concurrency",
+  "level": "intermediate",
+  "q": "What is an actor and what problem does it solve?",
+  "a": "An actor is a reference type that **protects its mutable state** by allowing only one task at a time to run its isolated code. This prevents **data races**.\n\nAccessing an actor's isolated properties or methods from outside requires `await`, because you may have to wait your turn.\n\n```swift\nactor Counter { var value = 0; func increment() { value += 1 } }\nlet c = Counter(); await c.increment()\n```\n\nCaveat: actors are **reentrant**. At each `await` inside an actor method, other calls can run, so re-check state after suspension points."
+ },
+ {
+  "id": "sendable",
+  "category": "Concurrency",
+  "level": "advanced",
+  "q": "What is `Sendable`?",
+  "a": "`Sendable` marks types that are safe to share across concurrency domains (tasks and actors) without data races.\n\n- Value types whose stored properties are all Sendable conform **implicitly**.\n- Actors are Sendable.\n- `final` classes with only immutable `let` Sendable properties can conform.\n- `@Sendable` closures can't capture mutable state.\n- `@unchecked Sendable` opts out of checking (use only with your own locking).\n\nIn the Swift 6 language mode, passing non-Sendable values across isolation boundaries is a **compile error**."
+ },
+ {
+  "id": "main-actor",
+  "category": "Concurrency",
+  "level": "intermediate",
+  "q": "What is `@MainActor` and when do you use it?",
+  "a": "`@MainActor` is a **global actor** representing the main thread. Code isolated to it runs on the main thread, which is required for UI updates in UIKit and SwiftUI.\n\nApply it to view models, UI-touching functions or whole types. From other contexts, call such code with `await`, or use `await MainActor.run { }`.\n\nSwiftUI `View`s are main-actor isolated, so your view code is already on the main actor. Newer projects can even make main-actor isolation the **default** for a module."
+ },
+ {
+  "id": "data-race",
+  "category": "Concurrency",
+  "level": "intermediate",
+  "q": "What is a data race and how does Swift 6 prevent it?",
+  "a": "A data race is when two threads access the same memory **at the same time**, at least one of them writes, and there's no synchronisation. The result is unpredictable values and crashes.\n\nSwift 6's language mode turns concurrency checking into **errors**. Using **actor isolation**, **Sendable** checking and region-based isolation analysis, the compiler proves that mutable state is never shared unsafely. Most races are now caught **at compile time** instead of in production."
+ },
+ {
+  "id": "gcd-vs-async",
+  "category": "Concurrency",
+  "level": "advanced",
+  "q": "How does Swift concurrency differ from GCD (DispatchQueue)?",
+  "a": "- **GCD** schedules closures on queues. Blocking a thread (with semaphores, for example) can cause **thread explosion**, and the compiler can't check data races.\n- **Swift concurrency** uses a cooperative thread pool sized to the CPU cores. Tasks **suspend** instead of blocking, actors and Sendable give **compile-time safety**, and you get structured cancellation and priorities.\n\nRule: don't block (`semaphore.wait()`, `sleep`) inside async code. Use `await` instead."
+ },
+ {
+  "id": "swiftui-state",
+  "category": "SwiftUI",
+  "level": "beginner",
+  "q": "What do `@State`, `@Binding` and `@Environment` do?",
+  "a": "- `@State`: private storage **owned by a view**. Changing it re-renders the view. Use it for local UI state (and to own `@Observable` models).\n- `@Binding`: a two-way reference to state owned by **someone else**, created with `$value`. It lets child views edit parent state.\n- `@Environment`: reads values passed down the view tree, both system values (`\\.colorScheme`, `\\.dismiss`, `\\.modelContext`) and your own observable objects (`@Environment(Cart.self)`)."
+ },
+ {
+  "id": "observable-vs-observableobject",
+  "category": "SwiftUI",
+  "level": "intermediate",
+  "q": "`@Observable` vs `ObservableObject`: what changed?",
+  "a": "`ObservableObject` (Combine) required `@Published` on each property, and **any** published change invalidated **every** observing view.\n\nThe `@Observable` macro (iOS 17+) tracks **which properties each view actually reads** and refreshes only those views. That gives better performance and simpler code (plain `var`s). With it you use `@State` instead of `@StateObject`, plain properties or `@Bindable` instead of `@ObservedObject`, and `@Environment(Type.self)` instead of `@EnvironmentObject`."
+ },
+ {
+  "id": "swiftui-view-identity",
+  "category": "SwiftUI",
+  "level": "advanced",
+  "q": "How does SwiftUI decide when to update or recreate a view?",
+  "a": "Views are lightweight **value descriptions**. SwiftUI diffs them by **identity**:\n\n- **Structural identity**: the view's position in the hierarchy (including `if`/`else` branches, which are different views).\n- **Explicit identity**: `id`s in `ForEach` / `List`, or the `.id(_:)` modifier.\n\nWhen a view's identity changes, its **state is reset** and its `onAppear`/`task` modifiers rerun. When only data changes, `body` is re-evaluated and the minimal changes are applied. Using unstable ids (like `UUID()` created in `body`) causes state loss and poor performance."
+ },
+ {
+  "id": "some-view",
+  "category": "SwiftUI",
+  "level": "beginner",
+  "q": "Why does `body` return `some View`?",
+  "a": "`body` combines many generic view types, so its real type is something huge like `VStack<TupleView<(Text, Button<Text>)>>`. `some View` is an **opaque return type**: the compiler knows the exact concrete type (for fast, static diffing), but you don't have to write it.\n\nIt must be **one** concrete type, so branching uses `@ViewBuilder` (which wraps `if`/`else` in `_ConditionalContent`), or `AnyView` (type-erased, which costs performance)."
+ },
+ {
+  "id": "swiftui-lifecycle",
+  "category": "SwiftUI",
+  "level": "intermediate",
+  "q": "What's the difference between `onAppear` and `.task`?",
+  "a": "`onAppear` runs a synchronous closure when the view appears. `.task { }` starts an **async task** when the view appears and **cancels it automatically** when the view disappears. `.task(id:)` also restarts when the id changes.\n\nPrefer `.task` for loading data: you get cancellation for free, so there are no updates to views that are gone."
+ },
+ {
+  "id": "list-performance",
+  "category": "SwiftUI",
+  "level": "intermediate",
+  "q": "How do you keep long SwiftUI lists fast?",
+  "a": "- Use `List` or `LazyVStack` inside a `ScrollView` (both lazy) for long content.\n- Give rows **stable, unique ids** (`Identifiable`).\n- Keep `body` and row views cheap: precompute formatted strings and avoid heavy work or sorting inside `body`.\n- Split large views into smaller subviews, so changes re-evaluate less.\n- Load images asynchronously (`AsyncImage` or a caching loader).\n- Profile with **Instruments → SwiftUI** to find excessive body evaluations."
+ },
+ {
+  "id": "mvvm",
+  "category": "iOS & Architecture",
+  "level": "intermediate",
+  "q": "Describe MVVM in a SwiftUI app.",
+  "a": "- **Model**: data and domain types (`Post`, `User`) and services or repositories (networking, persistence).\n- **ViewModel**: an `@Observable` (usually `@MainActor`) class holding screen state (`loading`, `loaded`, `failed`) and actions (`load()`, `delete()`). It's testable without UI.\n- **View**: declarative layout that reads the view model and forwards user actions.\n\nDependencies (an API client, for example) are injected as protocols, so previews and tests can use mocks. For simple screens, plain `@State` in the view is fine. Don't add a view model \"just because\"."
+ },
+ {
+  "id": "dependency-injection",
+  "category": "iOS & Architecture",
+  "level": "intermediate",
+  "q": "How would you do dependency injection in Swift?",
+  "a": "Pass dependencies in, instead of creating them internally:\n\n- **Initializer injection** (preferred): `init(api: any PostsAPI)`.\n- **Property injection** for optional collaborators.\n- **SwiftUI Environment**: `.environment(service)` for app-wide services.\n\nDepend on **protocols**, so tests and previews can pass fakes:\n\n```swift\nprotocol PostsAPI { func posts() async throws -> [Post] }\nstruct MockPostsAPI: PostsAPI { func posts() async throws -> [Post] { [.sample] } }\n```\n\nAvoid singletons for anything you want to test."
+ },
+ {
+  "id": "codable",
+  "category": "iOS & Architecture",
+  "level": "beginner",
+  "q": "How does Codable work, and how do you handle mismatched JSON keys?",
+  "a": "`Codable` = `Encodable & Decodable`. The compiler synthesizes the implementation when all properties are Codable. Use `JSONDecoder().decode(T.self, from: data)`.\n\nFor mismatched keys:\n- `decoder.keyDecodingStrategy = .convertFromSnakeCase` for `snake_case` → `camelCase`\n- a custom `enum CodingKeys: String, CodingKey { case imageURL = \"image_url\" }`\n- a custom `init(from:)` for complex transforms, defaults or nested containers\n\nAlso set `dateDecodingStrategy` (`.iso8601`, for example) for dates."
+ },
+ {
+  "id": "persistence-options",
+  "category": "iOS & Architecture",
+  "level": "beginner",
+  "q": "What options do you have to store data on iOS?",
+  "a": "- `UserDefaults` / `@AppStorage`: small settings (never secrets)\n- **Keychain**: passwords, tokens, keys (encrypted)\n- **SwiftData** (iOS 17+) or **Core Data**: structured object graphs and queries\n- **Files** (`FileManager`, the Documents or Caches directories): images, documents, JSON\n- **SQLite** directly, or libraries like GRDB\n- **CloudKit / iCloud** for sync across a user's devices"
+ },
+ {
+  "id": "app-lifecycle",
+  "category": "iOS & Architecture",
+  "level": "beginner",
+  "q": "What are the main app lifecycle states on iOS?",
+  "a": "Not running → **inactive** (in the foreground but not receiving events, for example during a call or the app switcher) → **active** → **background** (briefly running code) → **suspended** (in memory, not running) → possibly terminated by the system.\n\nIn SwiftUI, observe `@Environment(\\.scenePhase)` (`.active`, `.inactive`, `.background`) to save data or pause work. UIKit uses the `UIApplicationDelegate` and `UISceneDelegate` callbacks."
+ },
+ {
+  "id": "uikit-vs-swiftui",
+  "category": "iOS & Architecture",
+  "level": "intermediate",
+  "q": "SwiftUI or UIKit? Can you mix them?",
+  "a": "**SwiftUI** is declarative, has far less code, live previews and multi-platform support, and is Apple's direction for new UI. **UIKit** is imperative, mature, and offers the finest control over complex custom UI and older-iOS support.\n\nMost modern apps are SwiftUI-first, and you can **mix** them:\n- UIKit inside SwiftUI: `UIViewRepresentable` / `UIViewControllerRepresentable`\n- SwiftUI inside UIKit: `UIHostingController`"
+ },
+ {
+  "id": "testing",
+  "category": "iOS & Architecture",
+  "level": "intermediate",
+  "q": "How do you test iOS code?",
+  "a": "- **Unit tests** with **Swift Testing** (`@Test`, `#expect`, parameterized tests) or XCTest. Test view models, parsers and business logic.\n- **Mock dependencies** through protocols so tests are fast and don't touch the network.\n- **Async tests**: `@Test func load() async throws`.\n- **UI tests** with XCUITest for critical flows.\n- **Snapshot tests** (community libraries) for UI regressions.\n\nRun tests with ⌘U and in CI (Xcode Cloud or GitHub Actions)."
+ },
+ {
+  "id": "performance-tools",
+  "category": "iOS & Architecture",
+  "level": "advanced",
+  "q": "An app's scrolling stutters. How do you investigate?",
+  "a": "1. Reproduce on a **real device** in a **Release** build.\n2. Use **Instruments**: Time Profiler (main-thread work), the SwiftUI instrument (excessive `body` evaluations), Hitches, Allocations and Leaks.\n3. Common culprits: heavy work in `body` or `cellForRow`, synchronous image decoding, formatting allocations per frame, non-lazy stacks, unstable identities, large images.\n4. Fix by moving work off the main actor, caching, downsampling images, and using lazy containers.\n5. Measure again to confirm."
+ },
+ {
+  "id": "property-wrapper",
+  "category": "Types & Protocols",
+  "level": "advanced",
+  "q": "What is a property wrapper? Give an example.",
+  "a": "A property wrapper encapsulates reusable get/set logic for properties. You define a type with `@propertyWrapper` and a `wrappedValue`, and optionally a `projectedValue`, which you access with `$`.\n\n```swift\n@propertyWrapper struct Trimmed {\n    private var value = \"\"\n    var wrappedValue: String {\n        get { value }\n        set { value = newValue.trimmingCharacters(in: .whitespaces) }\n    }\n    init(wrappedValue: String) { self.wrappedValue = wrappedValue }\n}\nstruct Form { @Trimmed var name = \"\" }\n```\n\nSwiftUI's `@State`, `@Binding`, `@Environment` and `@AppStorage` are property wrappers."
+ },
+ {
+  "id": "macros",
+  "category": "Types & Protocols",
+  "level": "advanced",
+  "q": "What are Swift macros?",
+  "a": "Macros generate code at **compile time** from your source, checked by the compiler.\n\n- **Freestanding** macros (`#Preview`, `#Predicate`, `#expect`) produce expressions or declarations.\n- **Attached** macros (`@Observable`, `@Model`, `@Test`) add members, conformances or accessors to a declaration.\n\nThey remove boilerplate safely and can only add code, never silently remove yours. In Xcode, right-click → **Expand Macro** shows the generated code. Custom macros are built in a package using **SwiftSyntax**."
+ },
+ {
+  "id": "noncopyable",
+  "category": "Types & Protocols",
+  "level": "advanced",
+  "q": "What are noncopyable (`~Copyable`) types used for?",
+  "a": "A `~Copyable` type has **unique ownership**: it can't be implicitly copied, and passing it around **moves** it. The compiler enforces \"use exactly once\" rules with `consuming` and `borrowing` parameters, and noncopyable structs can have a `deinit`.\n\nUse cases: unique resources (file descriptors, locks), one-time tokens, and high-performance code that avoids reference counting and copies. Most app code doesn't need them."
+ },
+ {
+  "id": "dispatch-static-dynamic",
+  "category": "Types & Protocols",
+  "level": "advanced",
+  "q": "What's the difference between static and dynamic dispatch in Swift?",
+  "a": "- **Static dispatch**: the compiler knows exactly which function to call. It's fastest and inlinable. Used for structs and enums, `final` classes and members, `private` members, and protocol-extension-only methods.\n- **Dynamic dispatch**: the call is resolved at runtime through a **vtable** (overridable class methods), a **witness table** (protocol requirements via generics or existentials), or the **Objective-C runtime** (`@objc dynamic`).\n\nMarking classes `final` and preferring value types and generics helps the compiler use static dispatch."
+ },
+ {
+  "id": "code-reverse",
+  "category": "Coding Challenges",
+  "level": "beginner",
+  "q": "Write a function that checks whether a string is a palindrome (ignoring case, spaces and punctuation).",
+  "a": "```swift\nfunc isPalindrome(_ text: String) -> Bool {\n    let chars = text.lowercased().filter { $0.isLetter || $0.isNumber }\n    return chars == String(chars.reversed())\n}\n\nisPalindrome(\"A man, a plan, a canal: Panama\")   // true\nisPalindrome(\"Swift\")                            // false\n```\n\nTalking points: `Character` properties handle Unicode; it's O(n) time and O(n) extra space. A two-pointer version over an array of characters avoids building the reversed string."
+ },
+ {
+  "id": "code-fizzbuzz",
+  "category": "Coding Challenges",
+  "level": "beginner",
+  "q": "Implement FizzBuzz for 1...100 in idiomatic Swift.",
+  "a": "```swift\nfor n in 1...100 {\n    switch (n.isMultiple(of: 3), n.isMultiple(of: 5)) {\n    case (true, true): print(\"FizzBuzz\")\n    case (true, false): print(\"Fizz\")\n    case (false, true): print(\"Buzz\")\n    case (false, false): print(n)\n    }\n}\n```\n\nUsing a `switch` on a tuple shows off pattern matching and is exhaustive by construction."
+ },
+ {
+  "id": "code-two-sum",
+  "category": "Coding Challenges",
+  "level": "intermediate",
+  "q": "Given an array of Ints and a target, return the indices of two numbers that add up to the target.",
+  "a": "```swift\nfunc twoSum(_ nums: [Int], _ target: Int) -> (Int, Int)? {\n    var seen: [Int: Int] = [:]                // value -> index\n    for (i, n) in nums.enumerated() {\n        if let j = seen[target - n] { return (j, i) }\n        seen[n] = i\n    }\n    return nil\n}\n\ntwoSum([2, 7, 11, 15], 9)   // (0, 1)\n```\n\nO(n) time and O(n) space, using a dictionary. Mention the brute-force O(n²) alternative and why the hash map is better."
+ },
+ {
+  "id": "code-anagrams",
+  "category": "Coding Challenges",
+  "level": "intermediate",
+  "q": "Group a list of words into anagrams.",
+  "a": "```swift\nfunc groupAnagrams(_ words: [String]) -> [[String]] {\n    Dictionary(grouping: words) { String($0.lowercased().sorted()) }\n        .values\n        .map { $0.sorted() }\n}\n\ngroupAnagrams([\"eat\", \"tea\", \"tan\", \"ate\", \"nat\", \"bat\"])\n// [[\"ate\",\"eat\",\"tea\"], [\"nat\",\"tan\"], [\"bat\"]]\n```\n\nThe key is the sorted letters. That costs O(n · k log k) for n words of length k; a 26-letter count array as the key gives O(n · k)."
+ },
+ {
+  "id": "code-debounce",
+  "category": "Coding Challenges",
+  "level": "advanced",
+  "q": "Implement a debounced search: only call the API 300 ms after the user stops typing.",
+  "a": "```swift\n@Observable @MainActor\nfinal class SearchModel {\n    var query = \"\" { didSet { scheduleSearch() } }\n    private(set) var results: [String] = []\n    private var task: Task<Void, Never>?\n\n    private func scheduleSearch() {\n        task?.cancel()                                   // cancel the previous attempt\n        let q = query\n        task = Task {\n            try? await Task.sleep(for: .milliseconds(300))\n            guard !Task.isCancelled, !q.isEmpty else { return }\n            results = (try? await api.search(q)) ?? []\n        }\n    }\n}\n```\n\nEach keystroke cancels the pending task, so only the last one survives the delay. In SwiftUI you can also use `.task(id: query) { try? await Task.sleep(...) ... }`, which cancels automatically."
+ },
+ {
+  "id": "code-lru",
+  "category": "Coding Challenges",
+  "level": "advanced",
+  "q": "Design a simple thread-safe in-memory cache with a maximum size.",
+  "a": "```swift\nactor LRUCache<Key: Hashable & Sendable, Value: Sendable> {\n    private var storage: [Key: Value] = [:]\n    private var order: [Key] = []          // most recent at the end\n    private let capacity: Int\n\n    init(capacity: Int) { self.capacity = capacity }\n\n    func value(for key: Key) -> Value? {\n        guard let v = storage[key] else { return nil }\n        touch(key)\n        return v\n    }\n\n    func set(_ value: Value, for key: Key) {\n        storage[key] = value\n        touch(key)\n        if order.count > capacity {\n            storage[order.removeFirst()] = nil   // evict least recently used\n        }\n    }\n\n    private func touch(_ key: Key) {\n        order.removeAll { $0 == key }\n        order.append(key)\n    }\n}\n```\n\nAn **actor** gives thread safety with no locks. For O(1) operations, mention a dictionary plus a doubly-linked list, or `NSCache` for automatic memory-pressure eviction."
+ }
+]
